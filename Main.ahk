@@ -2769,7 +2769,7 @@ CreateMainUI() {
     Gui Font, s11 Norm, Segoe UI
     Gui Add, Picture, gDiscordServerClick w26 h20 x462 y226, % mainDir "images\discordIcon.png"
 
-    Gui Add, Tab3, vMainTabs x8 y8 w484 h210 +0x800000, Main|Crafting|Status|Settings|Credits|Extras
+    Gui Add, Tab3, vMainTabs x8 y8 w484 h210 +0x800000, Main|Crafting|Status|Settings|Extras|Credits
 
 ; main tab
     Gui Tab, 1
@@ -2893,11 +2893,12 @@ CreateMainUI() {
     Gui Add, GroupBox, x16 y40 w259 h170 vGeneralSettingsGroup -Theme +0x50000007, General
     Gui Font, s9 norm
     Gui Add, CheckBox, vVIPCheckBox x32 y58 w150 h22 +0x2, % " VIP Gamepass Owned"
-    Gui Add, CheckBox, vAzertyCheckBox x32 y78 w200 h22 +0x2, % " AZERTY Keyboard Layout"
-    Gui Add, CheckBox, vClaimDailyQuestsCheckBox x32 y98 w200 h22 +0x2, % " Auto Claim Daily Quests (30 min)"
-    Gui Add, CheckBox, gShifterCheckBoxClick vShifterCheckBox x32 y118 w200 h22 +0x2, % " Abyssal Hunter Shifter Mode"
-    Gui Add, Text, x32 y141 w200 h22, % "Collection Back Button Y Offset:" ; increase by 30 to move down
-    Gui Add, Edit, x206 y140 w50 h18
+    Gui Add, CheckBox, gArcanePathCheckBoxClick vArcanePathCheckBox x32 y78 w150 h22 +0x2, % " Arcane Paths"
+    Gui Add, CheckBox, vAzertyCheckBox x32 y118 w200 h22 +0x2, % " AZERTY Keyboard Layout"
+    Gui Add, CheckBox, vClaimDailyQuestsCheckBox x32 y138 w200 h22 +0x2, % " Auto Claim Daily Quests (30 min)"
+    Gui Add, CheckBox, gShifterCheckBoxClick vShifterCheckBox x32 y98 w200 h22 +0x2, % " Abyssal Hunter Shifter Mode"
+    Gui Add, Text, x32 y161 w200 h22, % "Collection Back Button Y Offset:" ; increase by 30 to move down
+    Gui Add, Edit, x206 y160 w50 h18
     Gui Add, UpDown, vBackOffsetUpDown Range-500-500, 0
 
     Gui Font, s10 w600
@@ -2921,7 +2922,7 @@ CreateMainUI() {
     Gui Add, Button, vImportSettingsButton gImportSettingsClick x317 y186 w130 h20, Import Settings
     
 ; credits tab
-    Gui Tab, 5
+    Gui Tab, 6
     Gui Font, s10 w600
     Gui Add, GroupBox, x16 y40 w231 h133 vCreditsGroup -Theme +0x50000007, The Creator
     Gui Add, Picture, w75 h75 x23 y62, % mainDir "images\pfp.png"
@@ -2947,7 +2948,7 @@ CreateMainUI() {
     Gui Add, Link, x268 y150 w200 h55, Join the <a href="https://discord.gg/DYUqwJchuV">Discord Server</a>! (Community)`n`nVisit the <a href="https://github.com/BuilderDolphin/dolphSol-Macro">GitHub</a>! (Updates + Versions)
 
 ; extras tab
-    Gui Tab, 6
+    Gui Tab, 5
     Gui Font, s10 w600
 
     ; General
@@ -3120,6 +3121,7 @@ global directValues := {"ObbyCheckBox":"DoingObby"
     ,"ObbyBuffCheckBox":"CheckObbyBuff"
     ,"CollectCheckBox":"CollectItems"
     ,"VIPCheckBox":"VIP"
+    ,"ArcanePathCheckBox":"ArcanePath"
     ,"BackOffsetUpDown":"BackOffset"
     ,"AutoEquipCheckBox":"AutoEquipEnabled"
     ,"CraftingIntervalUpDown":"CraftingInterval"
@@ -3667,11 +3669,21 @@ GetRobloxVersion:
 
 ShifterCheckBoxClick:
     Gui mainUI:Default
+    Gui, Submit, NoHide
     GuiControlGet, v,, ShifterCheckBox
     if (v){
     MsgBox, 0, Important, % "Shifter mode has not been tested with a non vip account and does not currently have Obby capabilites."
+    GuiControl,, ArcanePathCheckBox, 0
     }
     return
+
+ArcanePathCheckBoxClick:
+    Gui, Submit, NoHide
+    GuiControlGet, v,, ArcanePathCheckBox
+    if (v){
+        GuiControl,, ShifterCheckBox, 0
+    }
+    Return
 
 OCREnabledCheckBoxClick:
     Gui mainUI:Default
