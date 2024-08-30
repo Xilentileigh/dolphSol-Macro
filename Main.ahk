@@ -954,10 +954,16 @@ global running := 0
 
 initialize() {
     initialized := 1
-
-    if (disableAlignment) {
+    if (disableAlignment && options.DoingObby) {
         ; Re-enable for reconnects
         disableAlignment := false
+        doObby()
+    } else if (disableAlignment) {
+        disableAlignment := false
+    } else if (options.DoingObby) {
+        updateStatus("Aligning Camera (Obby)")
+        obbyAlign()
+        doObby()
     } else {
         alignCamera()
     }
@@ -1101,6 +1107,7 @@ rotateCameraMode(){
 
 alignCamera(){
     startDim(1,"Aligning Camera, Please wait...")
+    updateStatus("Aligning Camera")
 
     WinActivate, % "ahk_id " GetRobloxHWND()
     Sleep, 500
@@ -1143,6 +1150,49 @@ alignCamera(){
     resetCameraAngle()
 
     ; reset() ; Redundant, handleCrafting() will use align() if needed
+    removeDim()
+    reset()
+    Sleep, 2000
+}
+
+obbyAlign() {
+
+    startDim(1,"Aligning Camera, Please wait...")
+
+    WinActivate, % "ahk_id " GetRobloxHWND()
+    Sleep, 500
+
+    closeChat()
+    Sleep, 200
+
+    reset()
+    Sleep, 100
+
+    rotateCameraMode() ; Follow
+
+    clickMenuButton(2)
+    Sleep, 500
+    
+    getRobloxPos(rX,rY,rW,rH)
+    MouseMove, % rX + rW*0.15, % rY + 44 + rH*0.05 + options.BackOffset
+    Sleep, 200
+    MouseClick
+    Sleep, 200
+
+    rotateCameraMode()
+    resetCameraAngle()
+
+    Sleep, 100
+
+    press("s", 350)
+    press("d", 750)
+    press("w", 500)
+
+    rotateCameraMode() ; Follow
+    Sleep, 1500
+    rotateCameraMode() ; Default(Classic)
+    resetCameraAngle()
+
     removeDim()
     reset()
     Sleep, 2000
@@ -1289,17 +1339,47 @@ searchForItems(){
 }
 
 doObby(){
-    updateStatus("Doing Obby")
-    
-    runPath("doObby",[],1)
 
-    options.ObbyAttempts += 1
+    reset()
+    Sleep, 2000
+    obbyRun()
+
+    hasBuff := checkHasObbyBuff(BRCornerX,BRCornerY,statusEffectHeight)
+    Sleep, 1000
+    hasBuff := hasBuff || checkHasObbyBuff(BRCornerX,BRCornerY,statusEffectHeight)
+    if (!hasBuff){
+        Sleep, 5000
+        hasBuff := hasBuff || checkHasObbyBuff(BRCornerX,BRCornerY,statusEffectHeight)
+    }
+    if (!hasBuff)
+    {
+        ; align()
+        updateStatus("Obby Failed, Retrying")
+        lastObby := A_TickCount - obbyCooldown*1000
+        obbyAlign()
+        obbyRun()
+        hasBuff := checkHasObbyBuff(BRCornerX,BRCornerY,statusEffectHeight)
+        Sleep, 1000
+        hasBuff := hasBuff || checkHasObbyBuff(BRCornerX,BRCornerY,statusEffectHeight)
+        if (!hasBuff){
+            Sleep, 5000
+            hasBuff := hasBuff || checkHasObbyBuff(BRCornerX,BRCornerY,statusEffectHeight)
+        }
+        if (!hasBuff){
+            lastObby := A_TickCount - obbyCooldown*1000
+        }
+    }
+    if (options.Collectitems) {
+        alignCamera()
+    }
 }
 
 obbyRun(){
     global lastObby
     Sleep, 250
-    doObby()
+    updateStatus("Doing Obby")
+    runPath("doObby",[],1)
+    options.ObbyAttempts += 1
     lastObby := A_TickCount
     Sleep, 100
 }
@@ -2645,13 +2725,7 @@ mainLoop(){
 	
     enableAutoRoll() ; Check after ClickPlay to make sure not left off due to lag, etc
 
-    ; Equip preferred aura
-    if (options.AutoEquipEnabled) {
-        EquipAura(options.AutoEquipAura)
-    }
-
     if (!initialized){
-        updateStatus("Initializing")
         initialize()
     }
 
@@ -2697,53 +2771,47 @@ mainLoop(){
 
     if (options.PotionCraftingEnabled || options.ItemCraftingEnabled){
         if (getUnixTime()-options.LastCraftSession >= (options.CraftingInterval*60)) {
+            if (options.AutoEquipEnabled) {
+                EquipAura(options.AutoEquipAura)
+            }
             options.LastCraftSession := getUnixTime()
             handleCrafting()
         }
     }
     
-    if (options.DoingObby && (A_TickCount - lastObby) >= (obbyCooldown*1000)){
-        ; align()
+    if (options.CollectItems){
+        if (options.AutoEquipEnabled) {
+            EquipAura(options.AutoEquipAura)
+        }
         reset()
-        obbyRun()
+        Sleep, 2000
+        searchForItems()
+        if (options.DoingObby && (A_TickCount - lastObby) >= (obbyCooldown*1000)){
 
-        ; MouseGetPos, mouseX, mouseY
+                local TLCornerX, TLCornerY, width, height
+                getRobloxPos(TLCornerX, TLCornerY, width, height)
+                BRCornerX := TLCornerX + width
+                BRCornerY := TLCornerY + height
+                statusEffectHeight := Floor((height/1080)*54)
+
+            updateStatus("Aligning Camera (Obby)")
+            obbyAlign()
+            doObby()
+        }
+    } else if (options.DoingObby && (A_TickCount - lastObby) >= (obbyCooldown*1000)){
+        if (options.AutoEquipEnabled) {
+            EquipAura(options.AutoEquipAura)
+        }
+
         local TLCornerX, TLCornerY, width, height
         getRobloxPos(TLCornerX, TLCornerY, width, height)
         BRCornerX := TLCornerX + width
         BRCornerY := TLCornerY + height
         statusEffectHeight := Floor((height/1080)*54)
 
-        hasBuff := checkHasObbyBuff(BRCornerX,BRCornerY,statusEffectHeight)
-        Sleep, 1000
-        hasBuff := hasBuff || checkHasObbyBuff(BRCornerX,BRCornerY,statusEffectHeight)
-        if (!hasBuff){
-            Sleep, 5000
-            hasBuff := hasBuff || checkHasObbyBuff(BRCornerX,BRCornerY,statusEffectHeight)
-        }
-        if (!hasBuff)
-        {
-            ; align()
-            updateStatus("Obby Failed, Retrying")
-            lastObby := A_TickCount - obbyCooldown*1000
-            obbyRun()
-            hasBuff := checkHasObbyBuff(BRCornerX,BRCornerY,statusEffectHeight)
-            Sleep, 1000
-            hasBuff := hasBuff || checkHasObbyBuff(BRCornerX,BRCornerY,statusEffectHeight)
-            if (!hasBuff){
-                Sleep, 5000
-                hasBuff := hasBuff || checkHasObbyBuff(BRCornerX,BRCornerY,statusEffectHeight)
-            }
-            if (!hasBuff){
-                lastObby := A_TickCount - obbyCooldown*1000
-            }
-        }
-    }
-
-    if (options.CollectItems){
-        reset()
-        Sleep, 2000
-        searchForItems()
+        updateStatus("Aligning Camera (Obby)")
+        obbyAlign()
+        doObby()
     }
 
     /*
@@ -2788,7 +2856,7 @@ CreateMainUI() {
     Gui Add, GroupBox, x252 y40 w231 h70 vAutoEquipGroup -Theme +0x50000007, Auto Equip
     Gui Font, s9 norm
     Gui Add, CheckBox, vAutoEquipCheckBox x268 y61 w190 h22 +0x2, % " Enable Auto Equip"
-    Gui Add, Button, +gShowAuraEquipSearch x268 y83 w115 h22, Configure Search
+    Gui Add, Button, +gShowAuraEquipSearch vAuraButton x268 y83 w115 h22, Configure Search
     Gui Add, Button, gAutoEquipHelpClick vAutoEquipHelpButton x457 y50 w23 h23, ?
 
     Gui Font, s10 w600
@@ -2984,6 +3052,17 @@ CreateMainUI() {
     Gui Add, Text, x5 y5 w210 h15 vStatusBarText, Status: Waiting...
 
     Gui mainUI:Default
+
+    ; load the gui state
+    if (options.ArcanePath || options.Shifter) {
+        GuiControl, Disable, AutoEquipCheckBox
+        GuiControl, Disable, AuraButton
+        if (options.ArcanePath) {
+            GuiControl,, AuraButton, Arcane
+        } else {
+            GuiControl,, AuraButton, Abyssal Hunter
+        }
+    }
 }
 CreateMainUI()
 
@@ -3638,7 +3717,11 @@ StopClick:
 SubmitAuraName:
     Gui, AuraSearch:Submit, NoHide
     if (!ErrorLevel && auraName != "") {
-        options.AutoEquipAura := AuraNameInput
+        if (options.ArcanePath || options.Shifter) {
+            options.AutoEquipAura := DefinedAuraNameInput
+        } else {
+            options.AutoEquipAura := AuraNameInput
+        }
         options.SearchSpecialAuras := SearchSpecialAurasCheckBox
         saveOptions()
         Gui, AuraSearch:Destroy
@@ -3675,17 +3758,43 @@ ShifterCheckBoxClick:
     Gui, Submit, NoHide
     GuiControlGet, v,, ShifterCheckBox
     if (v){
-    MsgBox, 0, Important, % "Shifter mode has not been tested with a non vip account and does not currently have Obby capabilites."
-    GuiControl,, ArcanePathCheckBox, 0
+        MsgBox, 0, Important, % "Shifter mode has not been tested with a non vip account and does not currently have Obby capabilites."
+        GuiControl,, ArcanePathCheckBox, 0
+        GuiControl,, AuraButton, Abyssal Hunter
+        GuiControl,, AutoEquipCheckBox, 1
+        GuiControl, Disable, AutoEquipCheckBox
+        GuiControl, Disable, AuraButton
+        DefinedAuraNameInput := "Abyssal"
+    } else {
+        GuiControl,, AutoEquipCheckBox, 0
+        GuiControl, Enable, AutoEquipCheckBox
+        GuiControl, Enable, AuraButton
+        GuiControl,, AuraButton, Configure Search
+        GuiControl,, AutoEquipCheckBox, 0
+        options.AutoEquipAura := AuraNameInput
     }
+    Gosub, SubmitAuraName
     return
 
 ArcanePathCheckBoxClick:
+    Gui mainUI:Default
     Gui, Submit, NoHide
     GuiControlGet, v,, ArcanePathCheckBox
     if (v){
         GuiControl,, ShifterCheckBox, 0
+        GuiControl,, AuraButton, Arcane
+        GuiControl,, AutoEquipCheckBox, 1
+        GuiControl, Disable, AutoEquipCheckBox
+        GuiControl, Disable, AuraButton
+        DefinedAuraNameInput := "Arcane"
+    } else {
+        GuiControl,, AutoEquipCheckBox, 0
+        GuiControl, Enable, AutoEquipCheckBox
+        GuiControl, Enable, AuraButton
+        GuiControl,, AuraButton, Configure Search
+        options.AutoEquipAura := AuraNameInput
     }
+    Gosub, SubmitAuraName
     Return
 
 OCREnabledCheckBoxClick:

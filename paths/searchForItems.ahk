@@ -13,27 +13,6 @@ CoordMode, Mouse, Screen
 if (options.ArcanePath) {
     If (options.VIP) {
 
-        walkSend("s","Down")
-        walkSend("a","Down")
-        walkSleep(1300)
-        walkSend("a","Up")
-        walkSleep(2600)
-        walkSend("s","Up")
-        walkSend("d","Down")
-        walkSleep(200)
-        walkSend("d","Up")
-        collect(1)
-
-        walkSend("d","Down")
-        walkSleep(2150)
-        walkSend("d","Up")
-        ArcaneTeleport()
-        walkSleep(700)
-        collect(2)
-
-        reset()
-        Sleep, 2000
-
         walkSend("d","Down")
         walkSleep(300)
         jump()
@@ -56,7 +35,7 @@ if (options.ArcanePath) {
         walkSend("s","Up")
         walkSleep(225)
         walkSend("d","Up")
-        collect(3)
+        collect(1)
 
         walkSend("d","Down")
         walkSleep(500)
@@ -64,7 +43,25 @@ if (options.ArcanePath) {
         walkSleep(350)
         walkSend("d","Up")
         walkSleep(200)
+        walkSend("a","Down")
+        walkSleep(1000)
+        walkSend("a","Up")
         walkSend("w","Up")
+        collect(2)
+        
+        walkSend("s","Down")
+        walkSleep(4800)
+        walkSend("s","Up")
+        walkSend("a","Down")
+        walkSleep(200)
+        walkSend("a","Up")
+        collect(3)
+
+        walkSend("a","Down")
+        walkSleep(2250)
+        walkSend("a","Up")
+        ArcaneTeleport()
+        Sleep, 700
         collect(4)
 
         reset()
@@ -99,11 +96,8 @@ if (options.ArcanePath) {
 
         walkSend("a","Down")
         walkSleep(500)
-        walkSend("a","Up")
         ArcaneTeleport()
-        walkSleep(700)
-        walkSend("a","Down")
-        walkSleep(250)
+        walkSleep(1000)
         press("s",500)
         walkSend("a","Up")
         walkSend("s","Down")
@@ -134,27 +128,6 @@ if (options.ArcanePath) {
 
     } else {
 
-        walkSend("s","Down")
-        walkSend("a","Down")
-        walkSleep(1300)
-        walkSend("a","Up")
-        walkSleep(2625)
-        walkSend("s","Up")
-        walkSend("d","Down")
-        walkSleep(200)
-        walkSend("d","Up")
-        collect(1)
-
-        walkSend("d","Down")
-        walkSleep(2200)
-        walkSend("d","Up")
-        ArcaneTeleport()
-        walkSleep(700)
-        collect(2)
-
-        reset()
-        Sleep, 2000
-    
         walkSend("d","Down")
         walkSleep(300)
         jump()
@@ -177,7 +150,7 @@ if (options.ArcanePath) {
         walkSend("s","Up")
         walkSleep(350)
         walkSend("d","Up")
-        collect(3)
+        collect(1)
 
         walkSend("d","Down")
         walkSleep(500)
@@ -185,7 +158,25 @@ if (options.ArcanePath) {
         walkSleep(350)
         walkSend("d","Up")
         walkSleep(200)
+        walkSend("a","Down")
+        walkSleep(1000)
+        walkSend("a","Up")
         walkSend("w","Up")
+        collect(2)
+        
+        walkSend("s","Down")
+        walkSleep(4800)
+        walkSend("s","Up")
+        walkSend("a","Down")
+        walkSleep(200)
+        walkSend("a","Up")
+        collect(3)
+
+        walkSend("a","Down")
+        walkSleep(2250)
+        walkSend("a","Up")
+        ArcaneTeleport()
+        Sleep, 700
         collect(4)
 
         reset()
@@ -456,28 +447,6 @@ if (options.ArcanePath) {
     }
 } else {
 
-    walkSend("s","Down")
-    walkSend("a","Down")
-    walkSleep(1300)
-    walkSend("a","Up")
-    walkSleep(2600)
-    if (!options.VIP) {
-        walkSleep(25)
-    }
-    walkSend("s","Up")
-    walkSend("d","Down")
-    walkSleep(200)
-    walkSend("d","Up")
-    collect(1)
-
-    walkSend("d","Down")
-    walkSleep(3500)
-    walkSend("d","Up")
-    collect(2)
-
-    reset()
-    Sleep, 2000
-
     walkSend("d","Down")
     walkSleep(300)
     jump()
@@ -503,7 +472,7 @@ if (options.ArcanePath) {
         walkSleep(125)
     }
     walkSend("d","Up")
-    collect(3)
+    collect(1)
 
     walkSend("d","Down")
     walkSleep(500)
@@ -511,7 +480,23 @@ if (options.ArcanePath) {
     walkSleep(350)
     walkSend("d","Up")
     walkSleep(200)
+    walkSend("a","Down")
+    walkSleep(1000)
+    walkSend("a","Up")
     walkSend("w","Up")
+    collect(2)
+    
+    walkSend("s","Down")
+    walkSleep(4800)
+    walkSend("s","Up")
+    walkSend("a","Down")
+    walkSleep(200)
+    walkSend("a","Up")
+    collect(3)
+
+    walkSend("a","Down")
+    walkSleep(3500)
+    walkSend("a","Up")
     collect(4)
 
     reset()
@@ -521,7 +506,7 @@ if (options.ArcanePath) {
     walkSend("a","Down")
     walkSleep(3750)
     walkSend("a","Up")
-    walkSleep(750)
+    walkSleep(1150)
     walkSend("w","Up")
     collect(5)
 
